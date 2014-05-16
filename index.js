@@ -68,6 +68,13 @@ function handleHealthStatuses(stateName, statuses) {
         "unknown":  "unknown",
     };
     
+    var DEFAULT_SUMMARY_MAP = {
+        "passing":  "(•‿•)",
+        "warning":  "ಠ_ಠ",
+        "critical": "(╯°□°）╯︵ ┻━┻",
+        "unknown":  "¯\\_(ツ)_/¯",
+    };
+    
     if (Array.isArray(statuses) && statuses.length) {
         var multi = redis.multi();
         
@@ -81,7 +88,7 @@ function handleHealthStatuses(stateName, statuses) {
                 "check":   status.CheckID,
                 "type":    "service",
                 "state":   STATE_MAP[status.Status],
-                "summary": "¯\\_(ツ)_/¯", // must exist, be non-empty
+                "summary":  DEFAULT_SUMMARY_MAP[status.Status], // must exist, be non-empty
                 "details": status.Output,
                 "time":    Math.floor((new Date()).getTime() / 1000),
             };
