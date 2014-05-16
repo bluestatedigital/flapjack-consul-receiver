@@ -1,0 +1,34 @@
+{
+  "name": "flapjack-consul-receiver",
+  "version": "0.0.0",
+  "description": "Flapjack receiver for Consul events",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test",
+    "package": "grunt package"
+  },
+  "bin": {
+    "flapjack-consul-receiver": "./index.js"
+  },
+  "keywords": [
+    "consul"
+  ],
+  "author": "Brian Lalor <blalor@bluestatedigital.com>",
+  "license": "WTFPL",
+  "dependencies": {
+    "assert-plus": "^0.1.5",
+    "bunyan": "^0.22.3",
+    "q": "^1.0.1",
+    "redis": "^0.10.1",
+    "request": "^2.34.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-mocha-test": "^0.10.2",
+    "grunt-prepare-install": "^0.1.3",
+    "semver-utils": "^1.1.0",
+    "time-grunt": "^0.3.1"
+  }
+}
