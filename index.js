@@ -9,7 +9,7 @@ var Redis  = require("redis");
 var logger = bunyan.createLogger({
     name: "flapjack-consul-receiver",
     stream: process.stdout,
-    level: "trace",
+    level: "info",
 });
 
 var redisHost = process.argv[2];
