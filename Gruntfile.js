@@ -66,15 +66,6 @@ module.exports = function(grunt) {
         "rpm-package",
     ]);
     
-    grunt.registerTask("package", [
-        "jshint",
-        "test",
-        "set-git-config",
-        "prepare_install",
-        "prepare-package",
-        "tar-package",
-    ]);
-    
     grunt.registerTask("set-git-config", function() {
         var done = this.async();
         
@@ -154,7 +145,7 @@ module.exports = function(grunt) {
                 {
                     data: {
                         // development build; assume Jenkins
-                        build_num: process.env.BUILD_NUMBER,
+                        build_num: process.env.BUILD_NUMBER || 0,
                         
                         semver: parsedVer,
                         commit_time: grunt.template.date(grunt.config("git.commit_time"), "yyyymmddHHMM"),
@@ -170,21 +161,19 @@ module.exports = function(grunt) {
             "-s", "dir",
             "-t", "rpm",
             "-C", packageRoot,
-            "--name", grunt.config.process("<%= pkg.name %>"),
+            "--name", grunt.config().pkg.name,
             "--version", parsedVer.version,
             "--iteration", iteration,
-            
-            // runtime dependency on the zeromq3 system package, provided via
-            // epel
-            "--depends", "zeromq3",
         ];
         
         // we probably have a pkg.engines.node like ">= 0.10.14 < 0.11".  fpm
         // (well, RPM) requires separate depends like "nodejs >= 0.10.14" and
         // "nodejs < 0.11"
-        semver.parseRange(grunt.config().pkg.engines.node).forEach(function(range) {
-            fpmArgs = fpmArgs.concat(["--depends", "nodejs " + range.semver]);
-        });
+        if (grunt.config().pkg.engines && grunt.config().pkg.engines.node) {
+            semver.parseRange(grunt.config().pkg.engines.node).forEach(function(range) {
+                fpmArgs = fpmArgs.concat(["--depends", "nodejs " + range.semver]);
+            });
+        }
         
         fpmArgs.push(".");
         
