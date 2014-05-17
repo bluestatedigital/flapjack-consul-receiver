@@ -1,0 +1,6 @@
+# -*- bash -*-
+
+## required settings
+redis_host=""
+redis_port="6379"
+redis_db="10"

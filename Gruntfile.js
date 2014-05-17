@@ -1,6 +1,7 @@
 "use strict";
 
 var path   = require("path");
+var fs     = require("fs");
 var Q      = require("q");
 var semver = require("semver-utils");
 
@@ -94,6 +95,34 @@ module.exports = function(grunt) {
     // binary modules.
     grunt.registerTask("prepare-package", "npm install", function() {
         this.requires("prepare_install");
+        
+        var extraFiles = {
+            "etc/sysconfig": {
+                target: "/etc/sysconfig/" + grunt.config.get("pkg.name"),
+                mode: "444",
+            },
+            "etc/sysvinit.sh": {
+                target: "/etc/rc.d/init.d/" + grunt.config.get("pkg.name"),
+                mode: "555",
+            },
+        };
+        
+        Object.keys(extraFiles).forEach(function(key) {
+            var srcFile = path.join(
+                packageRoot,
+                grunt.config.get("prepare_install.options.installPrefix"),
+                "lib/node_modules",
+                grunt.config.get("pkg.name"),
+                key
+            );
+            
+            var target = path.join(packageRoot, extraFiles[key].target);
+            
+            grunt.file.copy(srcFile, target);
+            fs.chmodSync(target, extraFiles[key].mode);
+
+            grunt.file.delete(srcFile);
+        });
     });
     
     // tar up the installed module; depends on prepare-package
@@ -160,6 +189,7 @@ module.exports = function(grunt) {
         var fpmArgs = [
             "-s", "dir",
             "-t", "rpm",
+            // "--rpm-use-file-permissions", // why is this even necessary?
             "-C", packageRoot,
             "--name", grunt.config().pkg.name,
             "--version", parsedVer.version,

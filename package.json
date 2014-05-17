@@ -1,6 +1,6 @@
 {
   "name": "flapjack-consul-receiver",
-  "version": "0.0.0",
+  "version": "0.0.0-alpha",
   "description": "Flapjack receiver for Consul events",
   "main": "index.js",
   "scripts": {
@@ -11,9 +11,16 @@
     "flapjack-consul-receiver": "./index.js"
   },
   "keywords": [
-    "consul"
+    "consul",
+    "flapjack"
   ],
   "author": "Brian Lalor <blalor@bluestatedigital.com>",
+  "homepage": "https://github.com/bluestatedigital/flapjack-consul-receiver",
+  "bugs": "https://github.com/bluestatedigital/flapjack-consul-receiver/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bluestatedigital/flapjack-consul-receiver.git"
+  },
   "license": "WTFPL",
   "dependencies": {
     "assert-plus": "^0.1.5",
