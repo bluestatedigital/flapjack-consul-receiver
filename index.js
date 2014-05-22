@@ -5,21 +5,43 @@
 var bunyan = require("bunyan");
 var Q      = require("q");
 var Redis  = require("redis");
+var StatsD = require("node-statsd").StatsD;
+var fs     = require("fs");
+var assert = require("assert-plus");
+
+if (process.argv.length != 3) {
+    console.error("usage: " + process.argv[1] + " /path/to/config.json");
+    process.exit(1);
+}
+
+var config = JSON.parse(fs.readFileSync(process.argv[2]));
+
+assert.object(config, "config");
+
+assert.object(config.redis, "redis");
+assert.string(config.redis.host, "redis.host");
+assert.number(config.redis.port, "redis.port");
+assert.number(config.redis.db,   "redis.db");
+
+var statsd = new StatsD({ mock: true });
+
+if (config.statsd) {
+    assert.object(config.statsd, "statsd");
+    assert.string(config.statsd.host, "statsd.host");
+    assert.number(config.statsd.port, "statsd.port");
+    
+    statsd = new StatsD({
+        host: config.statsd.host,
+        port: config.statsd.port,
+        prefix: "flapjack.consul.",
+    });
+}
 
 var logger = bunyan.createLogger({
     name: "flapjack-consul-receiver",
     stream: process.stdout,
     level: "info",
 });
-
-var redisHost = process.argv[2];
-var redisPort = parseInt(process.argv[3], 10);
-var redisDb = parseInt(process.argv[4], 10);
-
-if (! redisHost || ! redisPort || ! redisDb) {
-    console.error("usage: " + process.argv[1] + " <redis host> <redis port> <redis db>");
-    process.exit(1);
-}
 
 var consul = new (require("./lib/consul").Consul)({
     host: "localhost",
@@ -29,7 +51,7 @@ var consul = new (require("./lib/consul").Consul)({
     logger: logger,
 });
 
-var redis = Redis.createClient(redisPort, redisHost);
+var redis = Redis.createClient(config.redis.port, config.redis.host);
 
 redis.on("error", function(err) {
     logger.fatal(err, "got a redis error");
@@ -59,6 +81,8 @@ function handleHealthStatuses(stateName, statuses) {
     */
     
     logger.debug({ stateName: stateName }, "got %d status records", statuses.length);
+    
+    statsd.increment("health." + stateName, statuses.length);
     
     // consul => flapjack
     var STATE_MAP = {
@@ -97,6 +121,9 @@ function handleHealthStatuses(stateName, statuses) {
                 evt.summary = status.Output.split("\n")[0];
             }
             
+            // keep in sync with flapjack-nagios-receiver
+            statsd.increment("events");
+            
             multi.lpush("events", JSON.stringify(evt));
         });
         
@@ -114,10 +141,10 @@ Q
     .then(function() {
         logger.info("connected to redis");
         
-        return Q.ninvoke(redis, "select", redisDb);
+        return Q.ninvoke(redis, "select", config.redis.db);
     })
     .then(function() {
-        logger.debug("selected db %d", redisDb);
+        logger.debug("selected db %d", config.redis.db);
         
         consul.watch("/v1/health/state/passing").on("response", function(statuses) {
             handleHealthStatuses("passing", statuses);

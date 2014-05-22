@@ -25,6 +25,7 @@
   "dependencies": {
     "assert-plus": "^0.1.5",
     "bunyan": "^0.22.3",
+    "node-statsd": "0.0.7",
     "q": "^1.0.1",
     "redis": "^0.10.1",
     "request": "^2.34.0"
