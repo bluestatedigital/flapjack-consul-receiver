@@ -1,0 +1,11 @@
+{
+    "redis": {
+        "host": "redis-host",
+        "port": 6379,
+        "db": 10
+    },
+    "statsd": {
+        "host": "statsd-host",
+        "port": 8125
+    }
+}

@@ -29,9 +29,6 @@ pidfile="/var/run/${prog}.pid"
 lockfile="/var/lock/subsys/${prog}"
 logfile="/var/log/${prog}.json"
 
-# pull in sysconfig settings; REQUIRED
-. /etc/sysconfig/${prog}
-
 start() {
     [ -x $exec ] || exit 5
     
@@ -54,7 +51,7 @@ start() {
     daemon \
         --pidfile=${pidfile} \
         --user=${user} \
-        " { ${exec} ${redis_host} ${redis_port} ${redis_db} &>> ${logfile} & } ; echo \$! >| ${pidfile} "
+        " { ${exec} /etc/flapjack-consul-receiver.json &>> ${logfile} & } ; echo \$! >| ${pidfile} "
     
     RETVAL=$?
     echo
