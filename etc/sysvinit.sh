@@ -28,14 +28,13 @@ exec="/opt/flapjack/consul/bin/${prog}"
 pidfile="/var/run/${prog}.pid"
 lockfile="/var/lock/subsys/${prog}"
 logfile="/var/log/${prog}.json"
+conffile="/etc/flapjack-consul-receiver.json"
 
 start() {
     [ -x $exec ] || exit 5
     
     ## check for required config
-    if [ -z "${redis_host}" ] || [ -z "${redis_port}" ] || [ -z "${redis_db}" ]; then
-        exit 6
-    fi
+    [ -e $conffile ] || exit 6
 
     umask 077
 
