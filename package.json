@@ -1,6 +1,6 @@
 {
   "name": "flapjack-consul-receiver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Flapjack receiver for Consul events",
   "main": "index.js",
   "scripts": {
