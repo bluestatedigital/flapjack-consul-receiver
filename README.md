@@ -1,3 +1,5 @@
+__abandoned__ -- not being developed or used
+
 # flapjack-consul-receiver
 
 Pumps [Consul][consul] check state into [Flapjack][flapjack].  Must run
